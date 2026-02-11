@@ -29,8 +29,6 @@ fn get_bills(transaction: &Transaction) -> Bills {
     let mut current_count = transaction.given - transaction.cost;
     let mut bills: Bills = Bills { hundreds: 0, fifties: 0, twenties: 0, tens: 0, fives: 0, ones: 0 };
 
-    println!("current_count: {}", current_count);
-
     while current_count.floor() > 0_f64 {
         if current_count >= 100_f64 {
             bills.hundreds = current_count as i32 / 100;

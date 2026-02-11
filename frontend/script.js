@@ -17,7 +17,6 @@ async function refresh() {
     for (let i = 0; i < entry[1]; i++) {
       let html = `<img src="currencies/${entry[0]}.png" width="261" height="100">`
       addInnerHtml("bills", html)
-      console.log(html)
     }
   }
 
@@ -28,13 +27,11 @@ async function refresh() {
       if (entry[0] == "nickels") size *= 0.9;
       let html = `<img src="currencies/${entry[0]}.png" width="${size}" height="${size}">`
       addInnerHtml("coins", html)
-      console.log(html)
     }
     let html = `<br>`
     addInnerHtml("coins", html)
   }
 
-  console.log(result);
 }
 
 document.getElementById("calculate").onclick = async () => {
