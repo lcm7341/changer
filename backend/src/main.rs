@@ -143,7 +143,7 @@ async fn main() -> std::io::Result<()> {
 
     HttpServer::new(move || {
         let cors = Cors::default()
-            .allowed_origin("https://lcm7341.github.io/")
+            .allowed_origin("https://lcm7341.github.io")
             .allowed_methods(vec!["GET", "POST"])
             .allowed_headers(vec![http::header::CONTENT_TYPE])
             .supports_credentials();
