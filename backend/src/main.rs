@@ -132,9 +132,15 @@ async fn main() -> std::io::Result<()> {
 
     HttpServer::new(move || {
         let cors = Cors::default()
-            .allow_any_origin()
-            .allow_any_header()
-            .allow_any_method();
+            .allowed_origin("https://lcm7341.github.io")
+            .allowed_methods(vec!["GET", "POST", "OPTIONS"])
+            .allowed_headers(vec![
+                http::header::CONTENT_TYPE,
+                http::header::ACCEPT,
+                http::header::ORIGIN,
+            ])
+            .supports_credentials()
+            .max_age(3600);
 
         App::new()
             .wrap(cors)
