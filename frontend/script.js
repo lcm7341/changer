@@ -40,6 +40,7 @@ document.getElementById("calculate").onclick = async () => {
   const given = parseFloat(document.getElementById("given_input").value);
 
   const res = await fetch("https://changer-iyfu.onrender.com/api/calculate_change", {
+    credentials: "include",
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ cost, given }),
