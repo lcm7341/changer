@@ -1,9 +1,8 @@
 use actix_web::cookie::Key;
 use actix_web::*;
-use std::sync::Mutex;
-use std::env;
 use actix_cors::Cors;
 use actix_session::*;
+use std::env;
 
 
 #[derive(serde::Deserialize, serde::Serialize, Clone, Debug)]
