@@ -143,17 +143,17 @@ async fn main() -> std::io::Result<()> {
 
     HttpServer::new(move || {
         let cors = Cors::default()
-            .allowed_origin("https://lcm7341.github.io/changer/")
+            .allowed_origin("https://lcm7341.github.io/")
             .allowed_methods(vec!["GET", "POST"])
             .allowed_headers(vec![http::header::CONTENT_TYPE])
             .supports_credentials();
 
         App::new()
             .wrap(cors)
-            .wrap(SessionMiddleware::new(
-                    storage::CookieSessionStore::default(),
-                    key.clone(),
-                ))
+            .wrap(SessionMiddleware::builder(storage::CookieSessionStore::default(), key.clone())
+                .cookie_same_site(cookie::SameSite::None)
+                .cookie_secure(true)
+                .build())
             .service(calculate_change)
             .service(get_change)
     })
