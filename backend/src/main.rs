@@ -144,10 +144,10 @@ async fn main() -> std::io::Result<()> {
 
     HttpServer::new(move || {
         let cors = Cors::default()
-            .allow_any_origin()
-            .allow_any_method()
-            .allow_any_header()
-            .send_wildcard();
+            .allowed_origin("https://lcm7341.github.io/changer/")
+            .allowed_methods(vec!["GET", "POST"])
+            .allowed_headers(vec![http::header::CONTENT_TYPE])
+            .supports_credentials();
 
         App::new()
             .wrap(cors)
