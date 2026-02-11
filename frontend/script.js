@@ -6,12 +6,8 @@ function addInnerHtml(element_id, html) {
   document.getElementById(element_id).innerHTML += html;
 }
 
-async function refresh() {
-  const res = await fetch("https://changer-iyfu.onrender.com/api/get_change", {
-    credentials: "include",
-  });
-  if (!res.ok) throw new Error(`get_cost failed: ${res.status}`);
-  const result = await res.json();
+async function refresh(payload) {
+  const result = payload
   document.getElementById("bills").innerHTML = ""
   document.getElementById("coins").innerHTML = ""
 
@@ -52,7 +48,7 @@ document.getElementById("calculate").onclick = async () => {
     body: JSON.stringify(payload),
   });
 
-  await refresh();
+  await refresh(payload);
 };
 
 refresh().catch(console.error);

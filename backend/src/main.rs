@@ -120,17 +120,6 @@ async fn calculate_change(session: Session, data: web::Json<Transaction>) -> imp
     HttpResponse::Ok().json(change)
 }
 
-#[get("/api/get_change")]
-async fn get_change(session: Session) -> impl Responder {
-    let change = session.get("change")
-        .unwrap()
-        .unwrap_or(Change {
-            bills: Bills { hundreds: 0, fifties: 0, twenties: 0, tens: 0, fives: 0, ones: 0 },
-            coins: Coins { quarters: 0, dimes: 0, nickels: 0, pennies: 0 }
-        });
-    HttpResponse::Ok().json(change)
-}
-
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
 
@@ -154,7 +143,6 @@ async fn main() -> std::io::Result<()> {
                 .cookie_secure(true)
                 .build())
             .service(calculate_change)
-            .service(get_change)
     })
     .bind(("0.0.0.0", port))?
     .run()
