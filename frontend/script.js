@@ -1,36 +1,58 @@
-async function refresh() {
-  const res = await fetch("http://localhost:3001/api/get_cost");
-  if (!res.ok) throw new Error(`get_cost failed: ${res.status}`);
-  const cost = await res.json();
-
-  document.getElementById("cost").textContent = cost.cost;
-  console.log(cost);
+function setTextContent(element_id, text) {
+  document.getElementById(element_id).textContent = text;
 }
 
-document.getElementById("new_cost_btn").onclick = async () => {
-  try {
-    const inputEl = document.getElementById("new_cost");
+function addInnerHtml(element_id, html) {
+  document.getElementById(element_id).innerHTML += html;
+}
 
-    const cost = parseFloat(inputEl.value);
+async function refresh() {
+  const res = await fetch("http://localhost:3001/api/get_change");
+  if (!res.ok) throw new Error(`get_cost failed: ${res.status}`);
+  const result = await res.json();
+  document.getElementById("bills").innerHTML = ""
+  document.getElementById("coins").innerHTML = ""
 
-    // If new_cost is an <input> or <textarea>, use .value
-    const payload = { cost: cost};
-
-    const res = await fetch("http://localhost:3001/api/set_cost", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    });
-
-    if (!res.ok) {
-      const text = await res.text(); // helpful if server returns non-JSON error
-      throw new Error(`set_cost failed: ${res.status} ${text}`);
+  for (entry of Object.entries(result.bills)) {
+    for (let i = 0; i < entry[1]; i++) {
+      let html = `<img src="currencies/${entry[0]}.png" width="261" height="100">`
+      addInnerHtml("bills", html)
+      console.log(html)
     }
-
-    await refresh();
-  } catch (e) {
-    console.error(e);
   }
+
+  for (entry of Object.entries(result.coins)) {
+    for (let i = 0; i < entry[1]; i++) {
+      let size = 50;
+      if (entry[0] == "dimes" || entry[0] == "pennies") size *= 0.3;
+      if (entry[0] == "nickels") size *= 0.9;
+      let html = `<img src="currencies/${entry[0]}.png" width="${size}" height="${size}">`
+      addInnerHtml("coins", html)
+      console.log(html)
+    }
+    let html = `<br>`
+    addInnerHtml("coins", html)
+  }
+
+  console.log(result);
+}
+
+document.getElementById("calculate").onclick = async () => {
+  const cost_input = document.getElementById("cost_input");
+  const given_input = document.getElementById("given_input");
+
+  const cost = parseFloat(cost_input.value);
+  const given = parseFloat(given_input.value);
+
+  const payload = { cost: cost, given: given };
+
+  const res = await fetch("http://localhost:3001/api/calculate_change", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+
+  await refresh();
 };
 
 refresh().catch(console.error);
