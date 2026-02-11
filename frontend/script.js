@@ -48,7 +48,7 @@ document.getElementById("calculate").onclick = async () => {
     body: JSON.stringify(payload),
   });
 
-  await refresh(payload);
+  await refresh(res.json());
 };
 
 refresh().catch(console.error);
