@@ -150,7 +150,6 @@ async fn main() -> std::io::Result<()> {
                 http::header::ACCEPT,
                 http::header::ORIGIN,
             ])
-            .expose_headers(vec![http::header::SET_COOKIE]) // optional; debugging
             .supports_credentials()
             .max_age(3600);
 
