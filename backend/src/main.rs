@@ -1,7 +1,9 @@
+use actix_web::cookie::Key;
 use actix_web::*;
 use std::sync::Mutex;
 use std::env;
 use actix_cors::Cors;
+use actix_session::*;
 
 
 #[derive(serde::Deserialize, serde::Serialize, Clone, Debug)]
@@ -20,10 +22,6 @@ struct Coins {
     dimes: i32,
     nickels: i32,
     pennies: i32
-}
-
-struct State {
-    change: Mutex<Change>
 }
 
 fn get_bills(transaction: &Transaction) -> Bills {
@@ -102,7 +100,7 @@ struct Change {
 }
 
 #[post("/api/calculate_change")]
-async fn calculate_change(state: web::Data<State>, data: web::Json<Transaction>) -> impl Responder {
+async fn calculate_change(session: Session, data: web::Json<Transaction>) -> impl Responder {
     let transaction = Transaction {
         cost: data.cost,
         given: data.given
@@ -116,31 +114,33 @@ async fn calculate_change(state: web::Data<State>, data: web::Json<Transaction>)
         coins: coins.clone()
     };
 
-    *state.change.lock().unwrap() = change.clone();
+    let session_change: Change = change.clone();
+
+    session.insert("change", &session_change).unwrap();
 
     HttpResponse::Ok().json(change)
 }
 
 #[get("/api/get_change")]
-async fn get_change(state: web::Data<State>) -> impl Responder {
-    let change = state.change.lock().unwrap().clone();
+async fn get_change(session: Session) -> impl Responder {
+    let change = session.get("change")
+        .unwrap()
+        .unwrap_or(Change {
+            bills: Bills { hundreds: 0, fifties: 0, twenties: 0, tens: 0, fives: 0, ones: 0 },
+            coins: Coins { quarters: 0, dimes: 0, nickels: 0, pennies: 0 }
+        });
     HttpResponse::Ok().json(change)
 }
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
 
+    let key = Key::generate();
+
     let port: u16 = env::var("PORT")
         .unwrap_or_else(|_| "8080".into())
         .parse()
         .expect("PORT must be a number");
-
-    let state = web::Data::new(State {
-        change: Mutex::new(Change {
-            bills: Bills { hundreds: 0, fifties: 0, twenties: 0, tens: 0, fives: 0, ones: 0 },
-            coins: Coins { quarters: 0, dimes: 0, nickels: 0, pennies: 0 }
-        })
-    });
 
     HttpServer::new(move || {
         let cors = Cors::default()
@@ -151,7 +151,10 @@ async fn main() -> std::io::Result<()> {
 
         App::new()
             .wrap(cors)
-            .app_data(state.clone())
+            .wrap(SessionMiddleware::new(
+                    storage::CookieSessionStore::default(),
+                    key.clone(),
+                ))
             .service(calculate_change)
             .service(get_change)
     })
