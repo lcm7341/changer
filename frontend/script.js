@@ -7,7 +7,7 @@ function addInnerHtml(element_id, html) {
 }
 
 async function refresh() {
-  const res = await fetch("http://localhost:3001/api/get_change");
+  const res = await fetch("https://changer-iyfu.onrender.com/api/get_change");
   if (!res.ok) throw new Error(`get_cost failed: ${res.status}`);
   const result = await res.json();
   document.getElementById("bills").innerHTML = ""
@@ -43,7 +43,7 @@ document.getElementById("calculate").onclick = async () => {
 
   const payload = { cost: cost, given: given };
 
-  const res = await fetch("http://localhost:3001/api/calculate_change", {
+  const res = await fetch("https://changer-iyfu.onrender.com/api/calculate_change", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(payload),
