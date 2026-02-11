@@ -1,5 +1,6 @@
 use actix_web::*;
 use std::sync::Mutex;
+use std::env;
 use actix_cors::Cors;
 
 
@@ -129,6 +130,11 @@ async fn get_change(state: web::Data<State>) -> impl Responder {
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
 
+    let port: u16 = env::var("PORT")
+        .unwrap_or_else(|_| "8080".into())
+        .parse()
+        .expect("PORT must be a number");
+
     let state = web::Data::new(State {
         change: Mutex::new(Change {
             bills: Bills { hundreds: 0, fifties: 0, twenties: 0, tens: 0, fives: 0, ones: 0 },
@@ -149,7 +155,7 @@ async fn main() -> std::io::Result<()> {
             .service(calculate_change)
             .service(get_change)
     })
-    .bind(("127.0.0.1", 3001))?
+    .bind(("127.0.0.1", port))?
     .run()
     .await
 }
